@@ -1,0 +1,54 @@
+body {
+  /*padding-top: 65px;*/
+}
+
+.dropdown-menu > li > a {
+  text-align: center;
+}
+
+.navbar {
+  margin-bottom: 0px;
+  z-index: 9999;
+}
+
+.jumbotron {
+  height: 100vh;
+  text-shadow: black 0.05em 0.05em 0.05em;
+  background-image: url('../img/jumbo_bg.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.jumbotron > .container > h1 {
+  color: #FFF;
+  text-transform: uppercase;
+}
+
+.jumbotron > .container > p {
+  color: #FFF;
+}
+
+.jumbotron > .container {
+  padding-top: 10%;
+}
+
+/* Custom Button */
+
+.btn {
+  border-radius: 0px;
+}
+
+.custom-btn {
+  background: #428bca;
+  padding: 10px 20px 10px 20px;
+  color: #DDD;
+  transition: all ease-in 0.1s;
+}
+
+.custom-btn:hover {
+  text-decoration: none;
+  color: #FFF;
+  background: #4897db;
+
+}
+/* End Custom Button */
