@@ -32,7 +32,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">365<strong>Embroidery</strong></a>
+        <a class="navbar-brand pull-left" href="{% url 'home:index' %}"><img src="{% static 'home/img/365DE_mini_logo.png' %}" id="brand-logo" alt=""></a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -41,15 +41,15 @@
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
             <ul class="dropdown-menu">
-              <li><a href="#">Shirts</a></li>
-              <li><a href="#">Jackets</a></li>
-              <li><a href="#">Hats</a></li>
-              <li><a href="#">Backpacks</a></li>
+              <li><a href="{% url 'products:shirts' %}">Shirts</a></li>
+              <li><a href="{% url 'products:jackets' %}">Jackets</a></li>
+              <li><a href="{% url 'products:hats' %}">Hats</a></li>
+              <li><a href="{% url 'products:backpacks' %}">Backpacks</a></li>
               <li role="separator" class="divider"></li>
-              <li><a href="#">Custom Items</a></li>
+              <li><a href="{% url 'products:custom_items' %}">Custom Items</a></li>
             </ul>
           </li>
-          <li class="active"><a href="#">Services <span class="sr-only">(current)</span></a></li>
+          <li><a href="#">Services <span class="sr-only">(current)</span></a></li>
         </ul>
 
         {% comment %}
@@ -63,9 +63,29 @@
         {% endcomment %}
 
         <ul class="nav navbar-nav navbar-right text-center">
-          <li><a href="#">Contact Us</a></li>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
+          <li><a href="{% url 'contact:contact' %}">Contact Us</a></li>
+          <li><a href="{% url 'about:about' %}">About Us</a></li>
+
+          {% if current_user %}
+          <li class="dropdown active-user">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-user"></span>
+            <strong>{{ current_user }}
+              <span class="caret"></span>
+            </strong></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'orders:orders' %}">Your Orders</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="{% url 'logout' %}" id="signout-btn">
+                <span class="glyphicon glyphicon-off"></span> Log Out</a>
+              </li>
+            </ul>
+          </li>
+          {% else %}
+          <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
+          {% endif %}
+
+
 
           <li><a href="#"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> <span class="badge">4</span></a></li>
         </ul>
@@ -73,27 +93,174 @@
     </div><!-- /.container-fluid -->
   </nav>
 
-  <div id="fullpage">
-    <div class="section">Popular Products</div>
-    <div class="section">
-      <!-- Start Hero -->
+  <div class="jumbotron text-center" id="home-hero">
+    <img src="{% static 'home/img/365DE_logo.png' %}" id="home-page-logo" alt="">
+    <div class="row">
+      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <hr class="short-hr">
+      </div>
+    </div>
 
-      <div class="jumbotron">
-        <div class="container text-center">
-          <h1>Build Your Look</h1><br><br>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia, quidem consequuntur recusandae unde culpa corporis, doloremque ullam dolorum dolor necessitatibus.</p>
-          <br>
-          <br>
-          <br>
-          <p><a class="btn btn-primary btn-lg" href="#" role="button">Start Building</a></p>
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+        <h1>Customize any fabric-based item.</h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+        <h2>Start by choosing your project size.</h2>
+      </div>
+    </div>
+
+    <br><br>
+    <div class="row">
+      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <a href="#" class="hero-btn">Retail</a>
+      </div>
+    </div><br>
+    <div class="row">
+      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <a href="#" class="hero-btn">Wholesale</a>
+      </div>
+    </div>
+    <br>
+
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+        <h4>We have worked with</h4>
+      </div>
+    </div><br>
+
+    <div class="row">
+      <div class="col-lg-2">
+        <img src="{% static 'home/img/telemundo_logo.png' %}" class="clients-img" alt="">
+      </div>
+      <div class="col-lg-2">
+        <img src="{% static 'home/img/Equinox_logo.png' %}" class="clients-img" alt="">
+      </div>
+      <div class="col-lg-2">
+        <img src="{% static 'home/img/huff_logo.jpg' %}" class="clients-img" alt="">
+      </div>
+    </div>
+  </div>
+
+  <div class="jumbotron text-left" id="our-operation">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+        <h1>
+          We are a family-owned operation that provides both digitizing and embroidery solutions every day of the year.
+          <!-- Although we are modestly sized, we can tackle single item orders as well as bulk orders from start to finish. -->
+        </h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+        <h4>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore eligendi est recusandae minima quam deserunt numquam, quibusdam optio eum. Vero deleniti dignissimos ratione, ipsa nihil rem repellendus nobis. Earum aspernatur nostrum error tempora delectus magnam deleniti provident? Fuga autem animi commodi, odit numquam saepe consequatur sunt dolorum velit molestiae ducimus soluta non cupiditate suscipit quas reprehenderit vel magni distinctio facere esse beatae porro aspernatur dignissimos officia. Similique ducimus, amet dicta illum suscipit voluptate minus. Id eligendi ipsum iure vel, aperiam a suscipit dicta et eos magnam alias asperiores reiciendis eveniet molestias placeat perferendis. Reiciendis, alias, enim? Tempore provident deleniti fugiat.
+        </h4>
+      </div>
+    </div><br>
+
+    <div class="row">
+      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <a href="{% url 'about:about' %}" class="hero-btn inverse">More About Us</a>
+      </div>
+    </div>
+
+    <p></p>
+  </div>
+
+  <div class="jumbotron text-center" id="how-it-works">
+    <div class="container">
+
+
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+        <h1>How It Works</h1>
+      </div>
+    </div><br>
+
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-6">
+        <h2>1. Choose Item</h2>
+        <img src="{% static 'home/img/steps/first_step.png' %}" alt="">
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-6">
+        <h2>2. Choose Logo and Placement</h2>
+        <img src="{% static 'home/img/steps/second_step.png' %}" alt="">
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-6">
+        <h2>3. Choose Quantity, Colors, Sizes</h2>
+        <img src="{% static 'home/img/steps/third_step.png' %}" alt="">
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-6">
+        <h2>4. Check Out</h2>
+        <img src="{% static 'home/img/steps/fourth_step.png' %}" alt="">
+      </div>
+    </div><br>
+
+    <div class="row">
+      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <a href="{% url 'about:about' %}" class="hero-btn">Start Project</a>
+      </div>
+    </div>
+
+    <p></p>
+    </div>
+  </div>
+
+  <div class="jumbotron" id="help-order">
+    <div class="container">
+
+
+    <div class="row">
+      <div class="col-lg-7">
+        <h1>Are you a fellow embroiderer and need help finishing up an order?</h1>
+        <h2>Look no further, we can help you fulfill your order!</h2>
+      </div>
+
+      <div class="col-lg-4 col-lg-offset-1 col-md-4 col-md-offset-1">
+        <h2>If you are close to our headquarters, we can pick up your materials the same day.</h2>
+        <h2>Otherwise, you can always ship them to us and we'll ship them back when we're finished</h2>
+      </div>
+    </div><br>
+
+    <div class="row">
+
+    </div><br>
+
+    <div class="row">
+      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <a href="{% url 'about:about' %}" class="hero-btn inverse">Contact Us Now</a>
+      </div>
+    </div>
+
+    <p></p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="text-muted">Copyright (c) 2017 365 Digitizing and Embroidery All Rights Reserved.</p>
+      Something Else
+    </div>
+
+  </footer>
+
+  <!-- <div class="container">
+    <div class="panel panel-default home-panel">
+      <div class="panel-body">
+        <div class="row text-center">
+          <h1>Home</h1><br>
+          <a href="{% url 'builder:builder' %}" class="btn btn-info btn-lg">Open Builder</a>
         </div>
       </div>
-      <!-- End Hero -->
-  	</div>
-  	<div class="section">Project Size</div>
-  	<div class="section">How it Works</div>
-  	<div class="section">Some section</div>
-  </div>
+    </div>
+  </div> -->
+
+
 
 
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -108,9 +275,9 @@
   <script src="{% static 'home/js/main.js' %}"></script>
 
   <script type="text/javascript">
-    $(document).ready(function(){
-      $('#fullpage').fullpage();
-    });
+    // $(document).ready(function(){
+    //   $('#fullpage').fullpage();
+    // });
   </script>
 
 

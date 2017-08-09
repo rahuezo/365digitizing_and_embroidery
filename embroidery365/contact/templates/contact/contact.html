@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+
+  {% load static %}
+
+  {# ADD CSS #}
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <!-- Scroll Page CSS -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.4/jquery.fullpage.css">
+
+  <!-- Font Awesome CSS-->
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <!-- Social Media Button -->
+  <link rel="stylesheet" href="{% static 'contact/css/bootstrap-social.css'%}">
+
+  <!-- Local CSS -->
+  <link rel="stylesheet" href="{% static 'home/css/style.css' %}">
+
+</head>
+<body>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand pull-left" href="{% url 'home:index' %}"><img src="{% static 'home/img/365DE_mini_logo.png' %}" id="brand-logo" alt=""></a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav text-center">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'products:shirts' %}">Shirts</a></li>
+              <li><a href="{% url 'products:jackets' %}">Jackets</a></li>
+              <li><a href="{% url 'products:hats' %}">Hats</a></li>
+              <li><a href="{% url 'products:backpacks' %}">Backpacks</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="{% url 'products:custom_items' %}">Custom Items</a></li>
+            </ul>
+          </li>
+          <li><a href="#">Services <span class="sr-only">(current)</span></a></li>
+        </ul>
+
+        {% comment %}
+        <form class="navbar-form navbar-left">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+
+        {% endcomment %}
+
+        <ul class="nav navbar-nav navbar-right text-center">
+          <li><a href="{% url 'contact:contact' %}">Contact Us</a></li>
+          <li><a href="{% url 'about:about' %}">About Us</a></li>
+
+          {% if current_user %}
+          <li class="dropdown active-user">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-user"></span>
+            <strong>{{ current_user }}
+              <span class="caret"></span>
+            </strong></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'orders:orders' %}">Your Orders</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="{% url 'logout' %}" id="signout-btn">
+                <span class="glyphicon glyphicon-off"></span> Log Out</a>
+              </li>
+            </ul>
+          </li>
+          {% else %}
+          <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
+          {% endif %}
+
+
+
+          <li><a href="#"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> <span class="badge">4</span></a></li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+
+  <div class="container">
+    <h1 class="page-title text-center">Contact Us</h1>
+    <hr>
+
+    <div class="panel panel-default contact-method-panel">
+      <div class="panel-heading text-center">
+        <h2>What is your preferred method for reaching us?</h2>
+      </div><br>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <a id="contact-method-call" class="btn btn-success btn-lg contact-method-call">Call Us</a>
+          </div>
+        </div><br>
+        <div class="row">
+          <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <a id="contact-method-email" class="btn btn-info btn-lg contact-method-email">Email Us</a>
+          </div>
+        </div><br>
+        <div class="row">
+          <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <a id="contact-method-social" class="btn btn-primary btn-lg contact-method-social">Social Media</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-default contact-social-panel">
+      <div class="panel-heading text-center">
+        <h2>Get in touch with us on social media</h2>
+      </div><br>
+
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <a class="btn btn-block btn-social btn-facebook">
+              <span class="fa fa-facebook"></span> Reach us on Facebook
+            </a>
+          </div>
+        </div> <br>
+
+        <div class="row">
+          <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <a class="btn btn-block btn-social btn-instagram">
+              <span class="fa fa-instagram"></span> Reach us on Instagram
+            </a>
+          </div>
+        </div>
+
+      </div>
+      <div class="panel-footer text-center">
+          <br><span class="text-muted">Contact us by <a class="text-info contact-method-call"><strong>phone</strong></a> or by <a class="text-info contact-method-email"><strong>email</strong></a></span>
+      </div>
+    </div>
+
+    <div class="panel panel-default contact-phone-panel">
+      <div class="panel-heading text-center">
+        <h2 class="text-center">Call <strong>EVERY DAY</strong>at <strong>ALL</strong> hours <small>CA time</small></h2>
+      </div><br>
+      <div class="panel-body">
+        <div class="row">
+          <div class="text-center">
+            <h3><strong>Jose Santellano: 24 hours</strong></h3>
+            <h3><a href="tel:323-812-9953">(323) 812-9953</a></h3>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="text-center">
+            <h3><strong>Rudy Huezo: 10am - 5pm</strong></h3>
+            <h3><a href="tel:408-599-4933">(408) 599-4933</a></h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="text-center">
+            <h3><strong>Rosa Huezo: 10am - 5pm</strong></h3>
+            <h3><a href="tel:818-939-2596">(818) 939-2596</a></h3>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="text-center">
+            <h3><strong>Israel Alvarado: 5pm - 10pm</strong></h3>
+            <h3><a href="tel:213-266-6105">(213) 266-6105</a></h3>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer text-center">
+          <br><span class="text-muted">Contact us by <a class="text-info contact-method-email"><strong>email</strong></a> or on <a class="text-info contact-method-social"><strong>social media</strong></a></span>
+      </div>
+    </div>
+
+    <div class="panel panel-default contact-email-panel">
+      <div class="panel-body">
+        <h2 class="text-center">Tell us how we may help you through Email</h2>
+        <hr>
+
+        <form id="contact-form" action="" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="form-group col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <input type="text" class="form-control input-lg" id="first_name" name="first_name" placeholder="First Name *" required>
+          </div>
+          <div class="form-group col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <input type="text" class="form-control input-lg" id="last_name" name="last_name" placeholder="Last Name *" required>
+          </div>
+          <div class="form-group col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <input type="email" class="form-control input-lg" id="email" name="email" placeholder="Email *" required>
+          </div>
+          <div class="form-group col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <input type="tel" class="form-control input-lg" id="phone" name="phone" placeholder="Phone">
+          </div>
+          <div class="form-group col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <input type="text" class="form-control input-lg" id="order_no" name="order_no" placeholder="Order Number (if applicable)">
+          </div>
+
+          <div class="form-group col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <textarea placeholder="Comments *" class="form-control input-lg" name="comments" required></textarea>
+          </div>
+
+
+          <div class=" form-group col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2">
+            <input type="submit" class="btn btn-primary btn-lg" id="signup-btn" value="Submit"> <br><br>
+          </div>
+
+        </form> <br>
+      </div>
+      <div class="panel-footer text-center">
+        <br><span class="text-muted">Contact us by <a class="text-info contact-method-call"><strong>phone</strong></a> or on <a class="text-info contact-method-social"><strong>social media</strong></a></span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  <!-- Full Page JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.4/jquery.fullpage.extensions.min.js"></script>
+  <!-- Local JS -->
+  <script src="{% static 'home/js/main.js' %}"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+      // $('.contact-email-panel').fadeIn();
+
+      let contact_method_panel = $('.contact-method-panel');
+
+      $('.contact-method-call').click(function(){
+        contact_method_panel.slideUp();
+        $('.contact-email-panel').slideUp();
+        $('.contact-social-panel').slideUp();
+        $('.contact-phone-panel').slideDown();
+      });
+
+      $('.contact-method-email').click(function(){
+        contact_method_panel.slideUp();
+        $('.contact-phone-panel').slideUp();
+        $('.contact-social-panel').slideUp();
+        $('.contact-email-panel').slideDown();
+      });
+
+      $('.contact-method-social').click(function(){
+        contact_method_panel.slideUp();
+        $('.contact-email-panel').slideUp();
+        $('.contact-phone-panel').slideUp();
+        $('.contact-social-panel').slideDown();
+      });
+    });
+  </script>
+
+
+</body>
+</html>
