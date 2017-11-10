@@ -20,8 +20,11 @@
   <!-- Local CSS -->
   <link rel="stylesheet" href="{% static 'home/css/style.css' %}">
 
+  <link rel="icon" href="{% static 'home/img/favicon.png' %}" sizes="16x16 32x32" type="image/png">
+
 </head>
 <body>
+  <div id="wrapper">
   <nav class="navbar navbar-default">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -32,11 +35,12 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="{% url 'home:index' %}">365<strong>Embroidery</strong></a>
+        <a class="navbar-brand pull-left" href="{% url 'home:index' %}"><img src="{% static 'home/img/365DE_mini_logo.png' %}" id="brand-logo" alt=""></a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        {% comment %}
         <ul class="nav navbar-nav text-center">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
@@ -51,15 +55,6 @@
           </li>
           <li><a href="#">Services <span class="sr-only">(current)</span></a></li>
         </ul>
-
-        {% comment %}
-        <form class="navbar-form navbar-left">
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
-        </form>
-
         {% endcomment %}
 
         <ul class="nav navbar-nav navbar-right text-center">
@@ -74,30 +69,216 @@
               <span class="caret"></span>
             </strong></a>
             <ul class="dropdown-menu">
-              <li><a href="#">Your Orders</a></li>
+              {% if request.user.is_superuser %}
+              <li><a href="{% url 'admin_dashboard:dashboard' %}">Admin Dashboard</a></li>
+              {% endif %}
+              <li><a href="{% url 'myaccount' %}">Manage Account</a></li>
+              <li><a href="{% url 'orders:orders' %}">Your Orders</a></li>
               <li role="separator" class="divider"></li>
               <li><a href="{% url 'logout' %}" id="signout-btn">
                 <span class="glyphicon glyphicon-off"></span> Log Out</a>
               </li>
             </ul>
           </li>
+          <li><a href="{% url 'cart:cart' %}"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> {% if current_user %}<span class="badge">{{ nitems_in_cart }}</span>{% endif %}</a></li>
           {% else %}
           <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
           {% endif %}
-
-
-
-          <li><a href="#"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> <span class="badge">4</span></a></li>
         </ul>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
   </nav>
 
-  <div class="container">
-    <h1>Orders</h1>
+  <div id="content">
+  <div class="container" id="my-orders">
+    <div class="row" id="orders-header">
+      <div class="col-lg-12">
+        <h1 class="page-title text-center">My Orders</h1>
+      </div>
+    </div>
+
+    <div class="panel-group">
+      {% if placed_orders|length > 0 %}
+      {% for order in placed_orders %}
+
+      <div class="panel panel-primary {% if order.active == False %}canceled{% endif %}">
+        <div class="panel-heading {% if order.active == False %}canceled{% endif %}">
+          <div class="row text-center">
+            {% if order.active == False %}
+            <div class="col-lg-8">
+              <h3><span class="glyphicon glyphicon-ban-circle"></span> <strong>Order Has Been Canceled</strong></h3>
+            </div>
+            {% else %}
+            <div class="col-lg-4">
+              <h3>Order Placed: {{ order.created }}</h3>
+            </div>
+            <div class="col-lg-4">
+              <h3>Total: <strong>${{ order.total }}</strong></h3>
+            </div>
+            {% endif %}
+            <div class="col-lg-4">
+              <h3>Order #: {{ order.order_number }}</h3>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body {% if order.active == False %}canceled-panel{% endif %}">
+          {% for item in order.orderitem_set.all %}
+          <div class="row">
+            <div class="col-lg-12">
+              {{ item.order_details|safe}}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% if order.active == True %}
+        <div class="panel-footer order-actions">
+          <div class="row">
+            <div class="col-lg-2">
+              <button type="button" class="btn btn-info" name="button">Ask About Order</button>
+            </div>
+            <div class="col-lg-2">
+              <button type="button" class="btn btn-danger" name="button">Request Cancellation</button>
+            </div>
+
+            <div class="col-lg-8">
+              {% if order.status == 0 %}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Received <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Preparing
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Embroidering
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Finished
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Shipping
+                </div>
+              </div>
+              {% elif order.status == 1 %}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Received <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Preparing <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Embroidering
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Finished
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Shipping
+                </div>
+              </div>
+              {% elif order.status == 2 %}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Received <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Preparing <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Embroidering <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Finished
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Shipping
+                </div>
+              </div>
+              {% elif order.status == 3 %}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Received <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Preparing <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Embroidering <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Finished <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  Shipping
+                </div>
+              </div>
+              {% elif order.status == 4 %}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Received <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Preparing <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Embroidering <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Finished <span class="glyphicon glyphicon-ok"></span>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  Shipping <span class="glyphicon glyphicon-ok"></span>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% else %}
+      <hr>
+      <div class="row">
+        <div class="col-lg-12 no-orders-dashboard">
+          <h1 class="text-center text-muted">No Orders to Show at the Moment</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+          <a href="{% url 'builder:builder' %}" class="hero-btn inverse" id="start-project-from-cart">Start a Project</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
   </div>
 
+  <button type="button" name="button" class="back-to-top" data-placement="left" data-toggle="tooltip" title="Back to Top"><span class="glyphicon glyphicon-chevron-up"></span></button>
 
+  <div id="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-2 text-center"><img src="{% static 'home/img/365DE_mini_logo.png' %}" alt=""></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'home:index' %}">Home</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'contact:contact' %}">Contact Us</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'about:about' %}">About Us</a></div>
+        {% if not current_user %}
+        <div class="col-lg-2 text-center"><a href="{% url 'login' %}">Sign In</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'register' %}">Sign Up</a></div>
+        {% else %}
+        <div class="col-lg-2 text-center"><a href="{% url 'cart:cart' %}">Your Cart</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'orders:orders' %}">Your Orders</a></div>
+        {% endif %}
+      </div><br>
+      <div class="row">
+        <div class="col-lg-12"><p class="text-muted text-center">Copyright (c) 2017 365 Digitizing and Embroidery All Rights Reserved.</p></div>
+      </div>
+    </div>
+  </div>
+
+</div>
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
@@ -110,9 +291,36 @@
   <script src="{% static 'home/js/main.js' %}"></script>
 
   <script type="text/javascript">
-    // $(document).ready(function(){
-    //   $('#fullpage').fullpage();
-    // });
+    $(document).ready(function() {
+      var myvar = 100;
+      var offset = 250;
+      var duration = 300;
+
+      $(window).scroll(function() {
+        if ($(this).scrollTop() > offset) {
+          $(".back-to-top").fadeIn(duration);
+        } else {
+          $(".back-to-top").fadeOut(duration);
+        }
+      });
+
+      $(".back-to-top").click(function(event) {
+        event.preventDefault();
+
+        $("html, body").animate({scrollTop: 0}, duration);
+
+        return false;
+      });
+    });
+
+
+    $('.back-to-top').on('mouseenter', function(){
+      $('.back-to-top').tooltip('show');
+    });
+
+    $('.back-to-top').on('mouseleave', function(){
+      $('.back-to-top').tooltip('hide');
+    });
   </script>
 
 

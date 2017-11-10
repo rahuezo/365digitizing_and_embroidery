@@ -20,13 +20,11 @@
   <!-- Local CSS -->
   <link rel="stylesheet" href="{% static 'home/css/style.css' %}">
 
-  <!-- p5js  -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script>
-
-  <script src="{% static 'builder/js/sketch.js' %}"></script>
+  <link rel="icon" href="{% static 'home/img/favicon.png' %}" sizes="16x16 32x32" type="image/png">
 
 </head>
 <body>
+  <div id="wrapper">
   <nav class="navbar navbar-default">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -37,11 +35,12 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="{% url 'home:index' %}">365<strong>Embroidery</strong></a>
+        <a class="navbar-brand pull-left" href="{% url 'home:index' %}"><img src="{% static 'home/img/365DE_mini_logo.png' %}" id="brand-logo" alt=""></a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        {% comment %}
         <ul class="nav navbar-nav text-center">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
@@ -56,15 +55,6 @@
           </li>
           <li><a href="#">Services <span class="sr-only">(current)</span></a></li>
         </ul>
-
-        {% comment %}
-        <form class="navbar-form navbar-left">
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
-        </form>
-
         {% endcomment %}
 
         <ul class="nav navbar-nav navbar-right text-center">
@@ -79,6 +69,10 @@
               <span class="caret"></span>
             </strong></a>
             <ul class="dropdown-menu">
+              {% if request.user.is_superuser %}
+              <li><a href="{% url 'admin_dashboard:dashboard' %}">Admin Dashboard</a></li>
+              {% endif %}
+              <li><a href="{% url 'myaccount' %}">Manage Account</a></li>
               <li><a href="{% url 'orders:orders' %}">Your Orders</a></li>
               <li role="separator" class="divider"></li>
               <li><a href="{% url 'logout' %}" id="signout-btn">
@@ -86,30 +80,156 @@
               </li>
             </ul>
           </li>
+          <li><a href="{% url 'cart:cart' %}"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> {% if current_user %}<span class="badge">{{ nitems_in_cart }}</span>{% endif %}</a></li>
           {% else %}
           <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
           {% endif %}
-
-
-
-          <li><a href="#"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> <span class="badge">4</span></a></li>
         </ul>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
   </nav>
-
+  <div id="content">
   <div class="container">
-    <div class="panel panel-default home-panel">
-      <div class="panel-body">
-        <div class="row text-center">
-          <h1>Builder</h1><br>
-          <div id="builder-canvas"></div>
+    <h1 class="page-title text-center">Project Builder</h1>
+    <hr>
+
+    <form id="order-form" action="{% url 'builder:add_to_cart' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="panel-group text-center">
+        <div id="pre-order-div">
+          <div class="panel panel-primary" id="builder-step1">
+            <div class="panel-heading"><h3>1. Choose Base Item</h3></div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-lg-12">
+                  <select class="form-control" id="item-select" name="item-select">
+                    <option selected disabled>Choose an Item</option>
+                    {% for item in base_items %}
+                    <option value="{{ item.name }}">{{ item.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12">
+                  <select class="form-control" id="item-style-select" name="item-style-select">
+                    <option selected disabled>Choose a Style</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="panel panel-primary" id="builder-step2">
+            <div class="panel-heading"><h3>2. Choose Logo, Placement, and Size</h3></div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-lg-12">
+                  <h4>Upload an image of the logo you want to place on your base item.</h4><br>
+                  <input type="file" class="form-control" id="item-logo-input" name="item-logo-input" value="">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12" id="item-placement-div">
+                  <h4>Choose the placement of your logo.</h4><br>
+                  <select class="form-control" id="item-placement-select" name="item-placement-select">
+                    <option selected disabled>Choose Placement</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row" id="logo-size">
+                <h4>Choose the size of the logo.</h4><br>
+                <div class="col-lg-6">
+                  <label for="logo-width">Width in Inches</label>
+                  <input type="number" class="form-control" id="logo-width" name="logo-width" min="0" value="1" step="0.5" required>
+                </div>
+                <div class="col-lg-6">
+                  <label for="height-width">Height in Inches</label>
+                  <input type="number" class="form-control" id="logo-height" name="logo-height" min="0" value="1" step="0.5" required>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="panel panel-primary" id="builder-step3">
+            <div class="panel-heading"><h3>3. Choose Quantity, Colors, Sizes</h3></div>
+            <div class="panel-body">
+              <div id="order-items">
+
+              </div><br>
+
+              <div class="row">
+                <div class="col-lg-12">
+                  <button type="button" class="btn btn-primary btn-block" name="button" id="add-order-item-btn"><span class="glyphicon glyphicon-plus"></span> Add an Item</button>
+                </div>
+              </div><br>
+              <div class="row">
+                <div class="col-lg-12">
+                  <button type="button" class="btn btn-success btn-block" name="button" id="complete-order-btn"><span class="glyphicon glyphicon-check"></span> Complete Order</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><br>
+        <div class="panel panel-primary" id="builder-step4">
+          <div class="panel-heading"><h3>4. Add to Cart</h3></div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-lg-12">
+                <table class="table" id="receipt">
+
+                </table>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-12">
+                <h3 id="order-total" class="text-center"></h3>
+              </div>
+            </div><br>
+            <div class="row">
+              <div class="col-lg-12">
+                <h3 class="text-center">Extra Information About this Order (optional)</h3>
+                <textarea id="extra-info" name="extra-info" class="form-control" rows="4" placeholder="Enter extra details or specifications about this order..."></textarea>
+              </div>
+            </div><br>
+            <hr>
+            <div class="row">
+              <div class="col-lg-6">
+                <button type="button" class="btn btn-info" name="button" id="edit-order-btn"><span class="glyphicon glyphicon-pencil"></span> Edit Order</button>
+              </div>
+              <div class="col-lg-6">
+                <button type="submit" class="btn btn-warning" name="button" id="checkout-order-btn"><span class="glyphicon glyphicon-shopping-cart"></span> Add Order to Cart</button>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      <input type="hidden" id="order-details" name="order-details" value="">
+      <input type="hidden" id="order-total-input" name="order-total" value="">
+    </form>
+  </div>
+  </div>
+  <button type="button" name="button" class="back-to-top" data-placement="left" data-toggle="tooltip" title="Back to Top"><span class="glyphicon glyphicon-chevron-up"></span></button>
+
+  <div id="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-2 text-center"><img src="{% static 'home/img/365DE_mini_logo.png' %}" alt=""></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'home:index' %}">Home</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'contact:contact' %}">Contact Us</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'about:about' %}">About Us</a></div>
+        {% if not current_user %}
+        <div class="col-lg-2 text-center"><a href="{% url 'login' %}">Sign In</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'register' %}">Sign Up</a></div>
+        {% else %}
+        <div class="col-lg-2 text-center"><a href="{% url 'cart:cart' %}">Your Cart</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'orders:orders' %}">Your Orders</a></div>
+        {% endif %}
+      </div><br>
+      <div class="row">
+        <div class="col-lg-12"><p class="text-muted text-center">Copyright (c) 2017 365 Digitizing and Embroidery All Rights Reserved.</p></div>
       </div>
     </div>
   </div>
-
-
+</div>
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
@@ -118,16 +238,264 @@
 
   <!-- Full Page JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.4/jquery.fullpage.extensions.min.js"></script>
-
   <!-- Local JS -->
-  <script src="{% static 'builder/js/builder.js' %}"></script>
+  <script src="{% static 'home/js/main.js' %}"></script>
+  <!-- <script src="{% static 'builder/js/shirt.js' %}"></script> -->
 
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.12/p5.js"></script>
+  <!-- <script src="{% static 'builder/js/sketch.js' %}"></script> -->
 
   <script type="text/javascript">
-    // $(document).ready(function(){
-    //   $('#fullpage').fullpage();
-    // });
+    let styles = {
+      {% for k, v in styles.items %}
+      '{{ k }}': {{ v|safe }},
+      {% endfor %}
+    }
+
+    let placements = {
+      {% for k, v in placements.items %}
+      '{{ k }}': {{ v|safe }},
+      {% endfor %}
+    }
+
+    $(document).ready(function(){
+      $('#builder-step2').hide();
+      $('#builder-step3').hide();
+      $('#builder-step4').hide();
+      $('#item-style-select').hide();
+      $('#item-placement-div').hide();
+      $('#logo-size').hide();
+      $('#receipt').hide();
+
+      $('#item-select').change(function(){
+        let current_base_item = $(this).val();
+        let current_styles = styles[current_base_item];
+
+        let style_select = $('#item-style-select');
+
+        style_select.empty();
+        style_select.append($('<option>', {text: 'Choose a Style'}))
+
+        $('#item-style-select option:first').prop('disabled', 'disabled');
+
+        for (let i = 0; i < current_styles.length; i++ ){
+          style_select.append($('<option>', {value: current_styles[i], text: current_styles[i]}))
+        }
+
+        // step 2 stuff
+
+        let current_placements = placements[current_base_item];
+
+        let placement_select = $('#item-placement-select');
+
+        placement_select.empty();
+        placement_select.append($('<option>', {text: 'Choose Placement'}))
+
+        $('#item-placement-select option:first').prop('disabled', 'disabled');
+
+        for (let i = 0; i < current_placements.length; i++ ){
+          placement_select.append($('<option>', {value: current_placements[i], text: current_placements[i]}))
+        }
+
+        style_select.slideDown();
+      });
+
+      $('#item-style-select').change(function(){
+        $('#builder-step2').slideDown();
+      });
+
+      $('#item-logo-input').change(function(){
+        let placement_select = $('#item-placement-div');
+        placement_select.slideDown();
+      });
+
+      $('#item-placement-select').change(function(){
+        let logo_size = $('#logo-size');
+        add_order_item('disabled');
+        logo_size.slideDown();
+        $('#builder-step3').slideDown();
+      });
+
+      $('#complete-order-btn').click(function(){
+        show_receipt();
+        let order_details = $('#receipt').prop('outerHTML');
+        let order_total = $('#order-total-value').text();
+
+        $('#order-details').val(order_details);
+        $('#order-total-input').val(order_total);
+        $('#pre-order-div').slideUp();
+        $('#builder-step4').slideDown();
+      })
+
+      $('#edit-order-btn').click(function(){
+        $('#builder-step4').slideUp();
+        $('#pre-order-div').slideDown();
+      })
+
+
+      $('#add-order-item-btn').click(function(){
+        let number_of_items = $('#order-items .row').length + 1;
+
+        add_order_item();
+      });
+
+      $(document).on('click', '.new-btn', function(){
+        let parent = $(this).parent().parent();
+
+        let number_of_items = $('#order-items .row').length;
+
+        if (number_of_items > 1){
+          parent.hide();
+        }
+      });
+
+
+    });
+
+    function add_order_item(disability='') {
+      let order_items = $('#order-items');
+      let item_description = '';
+
+      let description_shirt = ['#item-style-select', '#item-select'];
+      let description_logo_name =  $('#item-logo-input').val().split('\\').slice(-1)[0];
+      let description_logo_placement = $('#item-placement-select').val();
+      let description_logo_size = $('#logo-width').val() + 'in. X ' + $('#logo-height').val() + 'in.';
+
+      for (let i = 0; i < description_shirt.length; i++) {
+        item_description += $(description_shirt[i]).val() + ' ';
+      }
+
+      item_description += ' with ' + '<strong>' + description_logo_name.slice(0,5) + '..' + description_logo_name.slice(description_logo_name.length - 4, description_logo_name.length) + '</strong>' + ' at ' + description_logo_placement + ' ' + description_logo_size;
+
+      let order_item_code = `<div class="row order-item">
+        <div class="col-lg-4">
+          <h4>Item</h4>
+          <p id="item-description">` + item_description.toUpperCase() + `</p>
+        </div>
+        <div class="col-lg-2">
+          <h4>Color</h4>
+          <input type="color" class="form-control" name="favcolor" value="#ff0000">
+          <!--<select class="form-control" name="">
+            <option value="Red">Red</option>
+            <option value="Green">Green</option>
+            <option value="Blue">Blue</option>
+          </select>-->
+        </div>
+        <div class="col-lg-2">
+          <h4>Size</h4>
+          <select class="form-control" name="">
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+          </select>
+        </div>
+        <div class="col-lg-2">
+          <h4>Quantity</h4>
+          <input type="number" class="form-control" name="" min="1" value="1">
+        </div>
+        <div class="col-lg-2">
+          <br><br>
+          <button type="button" class="btn btn-danger remove-order-item-btn new-btn" name="button" ` + disability + `>Remove</button>
+        </div>
+      </div>`
+
+      order_items.append($(order_item_code));
+    }
+
+    function make_receipt() {
+      let order_items = $('.order-item');
+      let checkout_items = [];
+      let order_total = 0;
+
+      for (let i=0; i < order_items.length; i++) {
+
+        let parts = $(order_items[i]).children('div');
+
+        let item = $($(parts[0]).children('p')[0]).text();
+        let color = $($(parts[1]).children('input')[0]).val();
+        let size = $($(parts[2]).children('select')[0]).val();
+        let quantity = $($(parts[3]).children('input')[0]).val();
+
+        let row_str, price;
+
+        row_str = quantity + ' ' + color + ' ' + size + ' ' + item;
+
+        price = price_calculator(quantity);
+
+        order_total += Number(price[0]);
+
+        checkout_items.push([quantity, color + ' ' + size + ' ' + item, '$ ' + price[1], '$ ' +price[0]]);
+      }
+      return [checkout_items, order_total.toFixed(2)];
+    }
+
+    function show_receipt() {
+      let receipt_items = make_receipt();
+      let rows = receipt_items[0];
+      let order_total = receipt_items[1];
+
+      let receipt = $('#receipt');
+
+      $('#order-total').html('Total: <strong>$ <span id="order-total-value"> ' + order_total + '</span></strong>');
+
+      receipt.html(`<thead>
+        <th>QTY</th>
+        <th>ITEM</th>
+        <th>UNIT PRICE</th>
+        <th>TOTAL</th>
+        </thead>`)
+
+      for(let i = 0; i < rows.length; i++) {
+        receipt.append('<tr><td>' + rows[i][0] + '</td><td>' +
+                      rows[i][1] + '</td><td>' +
+                      rows[i][2] + '</td><td>' + rows[i][3] + '</td></tr>')
+      }
+
+      receipt.slideDown();
+    }
+
+    function price_calculator(quantity) {
+      let width = $('#logo-width').val();
+      let height = $('#logo-height').val();
+      let sqi_price = 0.75;
+      let total = (quantity*(sqi_price * width * height)).toFixed(2);
+      let unit_price = (total / quantity).toFixed(2);
+      return [total, unit_price];
+    }
+
+    $(document).ready(function() {
+      var myvar = 100;
+      var offset = 250;
+      var duration = 300;
+
+      $(window).scroll(function() {
+        if ($(this).scrollTop() > offset) {
+          $(".back-to-top").fadeIn(duration);
+        } else {
+          $(".back-to-top").fadeOut(duration);
+        }
+      });
+
+      $(".back-to-top").click(function(event) {
+        event.preventDefault();
+
+        $("html, body").animate({scrollTop: 0}, duration);
+
+        return false;
+      });
+    });
+
+
+    $('.back-to-top').on('mouseenter', function(){
+      $('.back-to-top').tooltip('show');
+    });
+
+    $('.back-to-top').on('mouseleave', function(){
+      $('.back-to-top').tooltip('hide');
+    });
   </script>
 
 

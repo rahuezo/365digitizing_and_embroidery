@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from builder.models import Order
 
 
 def index(request):
@@ -10,9 +11,13 @@ def index(request):
         user_object = User.objects.get(username=request.user.username)
         current_user = "{0} {1}".format(user_object.first_name, user_object.last_name)
 
-        print "Current User", current_user
+        current_user_pk = request.user.pk
+        orders = Order.objects.filter(customer__pk=current_user_pk)
+
         context = {
             'current_user': current_user,
+            'nitems_in_cart': len(orders),
+
         }
     except:
         context = {}

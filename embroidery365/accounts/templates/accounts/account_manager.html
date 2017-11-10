@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Account Manager</title>
+
+  {% load static %}
+
+  {# ADD CSS #}
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <!-- Scroll Page CSS -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.4/jquery.fullpage.css">
+
+  <!-- Local CSS -->
+  <link rel="stylesheet" href="{% static 'home/css/style.css' %}">
+
+  <link rel="icon" href="{% static 'home/img/favicon.png' %}" sizes="16x16 32x32" type="image/png">
+
+</head>
+<body>
+  <div id="wrapper">
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand pull-left" href="{% url 'home:index' %}"><img src="{% static 'home/img/365DE_mini_logo.png' %}" id="brand-logo" alt=""></a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        {% comment %}
+        <ul class="nav navbar-nav text-center">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'products:shirts' %}">Shirts</a></li>
+              <li><a href="{% url 'products:jackets' %}">Jackets</a></li>
+              <li><a href="{% url 'products:hats' %}">Hats</a></li>
+              <li><a href="{% url 'products:backpacks' %}">Backpacks</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="{% url 'products:custom_items' %}">Custom Items</a></li>
+            </ul>
+          </li>
+          <li><a href="#">Services <span class="sr-only">(current)</span></a></li>
+        </ul>
+        {% endcomment %}
+
+        <ul class="nav navbar-nav navbar-right text-center">
+          <li><a href="{% url 'contact:contact' %}">Contact Us</a></li>
+          <li><a href="{% url 'about:about' %}">About Us</a></li>
+
+          {% if current_user %}
+          <li class="dropdown active-user">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-user"></span>
+            <strong>{{ current_user }}
+              <span class="caret"></span>
+            </strong></a>
+            <ul class="dropdown-menu">
+              {% if request.user.is_superuser %}
+              <li><a href="{% url 'admin_dashboard:dashboard' %}">Admin Dashboard</a></li>
+              {% endif %}
+              <li><a href="{% url 'myaccount' %}">Manage Account</a></li>
+              <li><a href="{% url 'orders:orders' %}">Your Orders</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="{% url 'logout' %}" id="signout-btn">
+                <span class="glyphicon glyphicon-off"></span> Log Out</a>
+              </li>
+            </ul>
+          </li>
+          <li><a href="{% url 'cart:cart' %}"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> {% if current_user %}<span class="badge">{{ nitems_in_cart }}</span>{% endif %}</a></li>
+          {% else %}
+          <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
+          {% endif %}
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+
+  <div id="content">
+  <div class="container" id="my-orders">
+    <div class="row" id="orders-header">
+      <div class="col-lg-12">
+        <h1 class="page-title text-center">Account Manager</h1>
+      </div>
+    </div>
+    <hr>
+    {% if messages %}
+    {% for message in messages %}
+    {% ifequal message.tags "success" %}
+    <div class="alert alert-success alert-dismissable text-center">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <strong><span class="glyphicon glyphicon-ok"></span> Changes saved successfully!</strong>
+    </div><br>
+    {% endifequal %}
+    {% endfor %}
+    {% endif %}
+    <form class="" action="{% url 'update_info' %}" method="post">
+      {% csrf_token %}
+      <div class="panel-group">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h4>Name</h4>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <input type="text" class="form-control" id="first-name" name="first-name" value="{{ first_name }}">
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" id="last-name" name="last-name" value="{{ last_name }}">
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h4>Email</h4>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <input type="email" class="form-control" id="email" name="email" value="{{ email }}">
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h4>Password <span class="extra-msg">you will have to log in again with the new password</span></h4>
+          </div>
+          <div class="panel-body">
+            {% if messages %}
+            {% for message in messages %}
+            {% ifequal message.tags "invalid_password error" %}
+            <div class="alert alert-danger alert-dismissable text-center">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+              <strong><span class="glyphicon glyphicon-remove-circle"></span> {{ message }}</strong>
+            </div><br>
+            {% endifequal %}
+            {% endfor %}
+            {% endif %}
+            <div class="form-group">
+              <input type="password" class="form-control" id="current-password" name="current-password" placeholder="Enter current password">
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter new password">
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm new password">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" name="button" class="btn btn-primary btn-lg btn-block"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+    </form>
+  </div>
+  </div>
+  <button type="button" name="button" class="back-to-top" data-placement="left" data-toggle="tooltip" title="Back to Top"><span class="glyphicon glyphicon-chevron-up"></span></button>
+
+  <div id="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-2 text-center"><img src="{% static 'home/img/365DE_mini_logo.png' %}" alt=""></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'home:index' %}">Home</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'contact:contact' %}">Contact Us</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'about:about' %}">About Us</a></div>
+        {% if not current_user %}
+        <div class="col-lg-2 text-center"><a href="{% url 'login' %}">Sign In</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'register' %}">Sign Up</a></div>
+        {% else %}
+        <div class="col-lg-2 text-center"><a href="{% url 'cart:cart' %}">Your Cart</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'orders:orders' %}">Your Orders</a></div>
+        {% endif %}
+      </div><br>
+      <div class="row">
+        <div class="col-lg-12"><p class="text-muted text-center">Copyright (c) 2017 365 Digitizing and Embroidery All Rights Reserved.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  <!-- Full Page JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.4/jquery.fullpage.extensions.min.js"></script>
+  <!-- Local JS -->
+  <script src="{% static 'home/js/main.js' %}"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var myvar = 100;
+      var offset = 250;
+      var duration = 300;
+
+      $(window).scroll(function() {
+        if ($(this).scrollTop() > offset) {
+          $(".back-to-top").fadeIn(duration);
+        } else {
+          $(".back-to-top").fadeOut(duration);
+        }
+      });
+
+      $(".back-to-top").click(function(event) {
+        event.preventDefault();
+
+        $("html, body").animate({scrollTop: 0}, duration);
+
+        return false;
+      });
+    });
+
+
+    $('.back-to-top').on('mouseenter', function(){
+      $('.back-to-top').tooltip('show');
+    });
+
+    $('.back-to-top').on('mouseleave', function(){
+      $('.back-to-top').tooltip('hide');
+    });
+  </script>
+
+
+</body>
+</html>

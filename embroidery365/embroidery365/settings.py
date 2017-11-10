@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'products',
     'orders',
     'builder',
+    'cart',
+    'admin_dashboard',
     'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',

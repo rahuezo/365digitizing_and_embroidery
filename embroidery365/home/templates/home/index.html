@@ -8,8 +8,6 @@
 
   {% load static %}
 
-  {# ADD CSS #}
-
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -17,11 +15,18 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.4/jquery.fullpage.css">
 
+  <!-- Font Awesome -->
+
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
   <!-- Local CSS -->
   <link rel="stylesheet" href="{% static 'home/css/style.css' %}">
 
+  <link rel="icon" href="{% static 'home/img/favicon.png' %}" sizes="16x16 32x32" type="image/png">
+
 </head>
 <body>
+  <div id="wrapper">
   <nav class="navbar navbar-default">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -37,6 +42,7 @@
 
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        {% comment %}
         <ul class="nav navbar-nav text-center">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
@@ -51,17 +57,7 @@
           </li>
           <li><a href="#">Services <span class="sr-only">(current)</span></a></li>
         </ul>
-
-        {% comment %}
-        <form class="navbar-form navbar-left">
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
-        </form>
-
         {% endcomment %}
-
         <ul class="nav navbar-nav navbar-right text-center">
           <li><a href="{% url 'contact:contact' %}">Contact Us</a></li>
           <li><a href="{% url 'about:about' %}">About Us</a></li>
@@ -74,6 +70,10 @@
               <span class="caret"></span>
             </strong></a>
             <ul class="dropdown-menu">
+              {% if request.user.is_superuser %}
+              <li><a href="{% url 'admin_dashboard:dashboard' %}">Admin Dashboard</a></li>
+              {% endif %}
+              <li><a href="{% url 'myaccount' %}">Manage Account</a></li>
               <li><a href="{% url 'orders:orders' %}">Your Orders</a></li>
               <li role="separator" class="divider"></li>
               <li><a href="{% url 'logout' %}" id="signout-btn">
@@ -81,17 +81,31 @@
               </li>
             </ul>
           </li>
+          <li><a href="{% url 'cart:cart' %}"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> {% if current_user %}<span class="badge">{{ nitems_in_cart }}</span>{% endif %}</a></li>
           {% else %}
           <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
+          <li><a href="{% url 'register' %}"><span class="glyphicon glyphicon-pencil"></span> Sign Up</a></li>
           {% endif %}
-
-
-
-          <li><a href="#"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> <span class="badge">4</span></a></li>
         </ul>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
   </nav>
+  <div id="content">
+  {% if logout_message %}
+  <div class="alert alert-success alert-dismissable text-center">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <strong><span class="glyphicon glyphicon-ok"></span> {{ logout_message }}</strong> <a href="{% url 'login' %}">Log in again?</a>
+  </div>
+  {% endif %}
+
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-success alert-dismissable text-center">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <strong><span class="glyphicon glyphicon-home"></span> {{ message }}</strong>
+  </div>
+  {% endfor %}
+  {% endif %}
 
   <div class="jumbotron text-center" id="home-hero">
     <img src="{% static 'home/img/365DE_logo.png' %}" id="home-page-logo" alt="">
@@ -109,29 +123,27 @@
 
     <div class="row">
       <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-        <h2>Start by choosing your project size.</h2>
-      </div>
-    </div>
-
-    <br><br>
-    <div class="row">
-      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
-        <a href="#" class="hero-btn">Retail</a>
-      </div>
-    </div><br>
-    <div class="row">
-      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
-        <a href="#" class="hero-btn">Wholesale</a>
+        <h3>Make your brand or personal style pop with custom embroidery work.</h3>
       </div>
     </div>
     <br>
+    <div class="row">
+      <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <a href="{% url 'builder:builder' %}" class="hero-btn">Start Project</a>
+      </div>
+    </div><br>
+    <div class="row">
+      <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <a href="{% url 'about:about' %}" class="hero-btn">About Us</a>
+      </div>
+    </div>
+    <br><br>
 
     <div class="row">
       <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
         <h4>We have worked with</h4>
       </div>
     </div><br>
-
     <div class="row">
       <div class="col-lg-2">
         <img src="{% static 'home/img/telemundo_logo.png' %}" class="clients-img" alt="">
@@ -147,122 +159,145 @@
 
   <div class="jumbotron text-left" id="our-operation">
     <div class="row">
-      <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+      <div class="col-lg-8 col-lg-offset-2 text-center">
         <h1>
           We are a family-owned operation that provides both digitizing and embroidery solutions every day of the year.
           <!-- Although we are modestly sized, we can tackle single item orders as well as bulk orders from start to finish. -->
         </h1>
       </div>
-    </div>
-
-    <div class="row">
-      <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-        <h4>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore eligendi est recusandae minima quam deserunt numquam, quibusdam optio eum. Vero deleniti dignissimos ratione, ipsa nihil rem repellendus nobis. Earum aspernatur nostrum error tempora delectus magnam deleniti provident? Fuga autem animi commodi, odit numquam saepe consequatur sunt dolorum velit molestiae ducimus soluta non cupiditate suscipit quas reprehenderit vel magni distinctio facere esse beatae porro aspernatur dignissimos officia. Similique ducimus, amet dicta illum suscipit voluptate minus. Id eligendi ipsum iure vel, aperiam a suscipit dicta et eos magnam alias asperiores reiciendis eveniet molestias placeat perferendis. Reiciendis, alias, enim? Tempore provident deleniti fugiat.
-        </h4>
-      </div>
     </div><br>
 
     <div class="row">
-      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+      <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
         <a href="{% url 'about:about' %}" class="hero-btn inverse">More About Us</a>
       </div>
     </div>
+  </div>
 
-    <p></p>
+  <div class="jumbotron" id="digitizing-service">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 text-center">
+        <h1>Digitizing Service</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h3>- <strong>$25</strong> flat rate for logo sizes up to 5 inches.</h3>
+        <h3>- <strong>Free</strong> embroidered sample prior to delivery.</h3>
+        <h3>- <strong>Free</strong> stitch count estimates.</h3>
+        <h3>- <strong>Free</strong> rate estimates for larger.</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 text-center">
+        <h1>Embroidery Service</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 text-center">
+        <h3>- You can provide us with a logo in an embroidery file format or use our digitizing service to create one from an image.</h3>
+        <h3>- Using our project builder you give us an idea of what garment you
+          wish to put the logo on. However, the estimated price only takes into account the stitch count and the number of items
+          the logo will be put on.
+        </h3>
+        <h3>- You have the option to provide us with all the garment or we can choose these for you from our distributors with your approval.</h3>
+        <h3>- The final price will include the cost of the embroidery service and the cost of the garment if it was chosen by us.</h3>
+        <h3>- There's no need to worry about hidden costs since we are transparent with our pricing and will give you a thourough
+        breakdown of all the order costs.</h3>
+      </div>
+    </div>
+    <br><br>
+    <div class="row">
+      <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <a href="{% url 'about:about' %}" class="hero-btn inverse">More About Pricing</a>
+      </div>
+    </div>
   </div>
 
   <div class="jumbotron text-center" id="how-it-works">
     <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+          <h1>How It Works</h1>
+        </div>
+      </div><br>
 
+      <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-6">
+          <h2>1. Choose Item</h2>
+          <img src="{% static 'home/img/steps/first_step.png' %}" alt="">
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6">
+          <h2>2. Choose Logo and Placement</h2>
+          <img src="{% static 'home/img/steps/second_step.png' %}" alt="">
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6">
+          <h2>3. Choose Quantity, Colors, Sizes</h2>
+          <img src="{% static 'home/img/steps/third_step.png' %}" alt="">
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6">
+          <h2>4. Check Out</h2>
+          <img src="{% static 'home/img/steps/fourth_step.png' %}" alt="">
+        </div>
+      </div><br>
 
-    <div class="row">
-      <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-        <h1>How It Works</h1>
-      </div>
-    </div><br>
-
-    <div class="row">
-      <div class="col-lg-3 col-md-3 col-sm-6">
-        <h2>1. Choose Item</h2>
-        <img src="{% static 'home/img/steps/first_step.png' %}" alt="">
-      </div>
-      <div class="col-lg-3 col-md-3 col-sm-6">
-        <h2>2. Choose Logo and Placement</h2>
-        <img src="{% static 'home/img/steps/second_step.png' %}" alt="">
-      </div>
-      <div class="col-lg-3 col-md-3 col-sm-6">
-        <h2>3. Choose Quantity, Colors, Sizes</h2>
-        <img src="{% static 'home/img/steps/third_step.png' %}" alt="">
-      </div>
-      <div class="col-lg-3 col-md-3 col-sm-6">
-        <h2>4. Check Out</h2>
-        <img src="{% static 'home/img/steps/fourth_step.png' %}" alt="">
-      </div>
-    </div><br>
-
-    <div class="row">
-      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
-        <a href="{% url 'about:about' %}" class="hero-btn">Start Project</a>
-      </div>
-    </div>
-
-    <p></p>
+      <div class="row">
+        <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+          <a href="{% url 'about:about' %}" class="hero-btn">Start Project</a>
+        </div>
+      </div><br>
     </div>
   </div>
 
   <div class="jumbotron" id="help-order">
-    <div class="container">
-
+    <div class="container text-center">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1>Are you a fellow embroiderer and need help finishing up an order?</h1><br>
+          <h2><strong>Look no further, we can help you fulfill your order!</strong></h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <h3>If you are close to our headquarters, we can pick up your materials the same day.</h3>
+          <h3>Otherwise, you can always ship them to us and we'll ship them back when we're finished</h3>
+        </div>
+      </div><br>
 
     <div class="row">
-      <div class="col-lg-7">
-        <h1>Are you a fellow embroiderer and need help finishing up an order?</h1>
-        <h2>Look no further, we can help you fulfill your order!</h2>
-      </div>
-
-      <div class="col-lg-4 col-lg-offset-1 col-md-4 col-md-offset-1">
-        <h2>If you are close to our headquarters, we can pick up your materials the same day.</h2>
-        <h2>Otherwise, you can always ship them to us and we'll ship them back when we're finished</h2>
+      <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <a href="{% url 'contact:contact' %}" class="hero-btn inverse">Contact Us Now</a>
       </div>
     </div><br>
-
-    <div class="row">
-
-    </div><br>
-
-    <div class="row">
-      <div class="col-lg-2 col-lg-offset-5 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
-        <a href="{% url 'about:about' %}" class="hero-btn inverse">Contact Us Now</a>
-      </div>
-    </div>
 
     <p></p>
     </div>
   </div>
+  </div>
 
-  <footer class="footer">
+
+  <!-- <div id="footer">
     <div class="container">
-      <p class="text-muted">Copyright (c) 2017 365 Digitizing and Embroidery All Rights Reserved.</p>
-      Something Else
-    </div>
-
-  </footer>
-
-  <!-- <div class="container">
-    <div class="panel panel-default home-panel">
-      <div class="panel-body">
-        <div class="row text-center">
-          <h1>Home</h1><br>
-          <a href="{% url 'builder:builder' %}" class="btn btn-info btn-lg">Open Builder</a>
-        </div>
+      <div class="row">
+        <div class="col-lg-2 text-center"><img src="{% static 'home/img/365DE_mini_logo.png' %}" alt=""></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'home:index' %}">Home</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'contact:contact' %}">Contact Us</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'about:about' %}">About Us</a></div>
+        {% if not current_user %}
+        <div class="col-lg-2 text-center"><a href="{% url 'login' %}">Sign In</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'register' %}">Sign Up</a></div>
+        {% else %}
+        <div class="col-lg-2 text-center"><a href="{% url 'cart:cart' %}">Your Cart</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'orders:orders' %}">Your Orders</a></div>
+        {% endif %}
+      </div><br>
+      <div class="row">
+        <div class="col-lg-12"><p class="text-muted text-center">Copyright (c) 2017 365 Digitizing and Embroidery All Rights Reserved.</p></div>
       </div>
     </div>
   </div> -->
-
-
-
-
+  </div>
+  <button type="button" name="button" class="back-to-top" data-placement="left" data-toggle="tooltip" title="Back to Top"><span class="glyphicon glyphicon-chevron-up"></span></button>
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
@@ -275,9 +310,36 @@
   <script src="{% static 'home/js/main.js' %}"></script>
 
   <script type="text/javascript">
-    // $(document).ready(function(){
-    //   $('#fullpage').fullpage();
-    // });
+    $(document).ready(function() {
+      var myvar = 100;
+      var offset = 250;
+      var duration = 300;
+
+      $(window).scroll(function() {
+        if ($(this).scrollTop() > offset) {
+          $(".back-to-top").fadeIn(duration);
+        } else {
+          $(".back-to-top").fadeOut(duration);
+        }
+      });
+
+      $(".back-to-top").click(function(event) {
+        event.preventDefault();
+
+        $("html, body").animate({scrollTop: 0}, duration);
+
+        return false;
+      });
+    });
+
+
+    $('.back-to-top').on('mouseenter', function(){
+      $('.back-to-top').tooltip('show');
+    });
+
+    $('.back-to-top').on('mouseleave', function(){
+      $('.back-to-top').tooltip('hide');
+    });
   </script>
 
 

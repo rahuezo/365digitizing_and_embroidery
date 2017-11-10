@@ -1,25 +1,57 @@
-body {
-  /*padding-top: 65px;*/
+html, body {
   overflow-x: hidden;
-  /*padding-bottom: 100px;*/
+  height: 100%;
+  margin: 0;
 }
 
-.jumbotron > h2 {
-  /*line-height: 300%; */
+#wrapper {
+  min-height: 100%;
+  position: relative;
 }
+.navbar .nav > li > a {
+   line-height: 50px;
+ }
+
+.dropdown-menu > li > a {
+  text-align: center;
+}
+
+.navbar {
+  margin-bottom: 0px;
+  border: none;
+  /*z-index: 100;*/
+  border-radius: 0px;
+  border-bottom: 0.005rem solid #CCC;
+  background: #EEE;
+}
+
+
+.navbar-brand,
+.navbar-nav li a, .navbar-nav li button {
+    line-height: 50px;
+    height: 50px;
+    padding-top: 0;
+}
+
+/*.navbar img {
+  width: 60px;
+  height: 60px;
+}*/
+
 
 .jumbotron {
-  margin-bottom: 0px;
   font-size: 2em;
+  background: transparent;
+  border-radius: 0px !important;
+}
+
+#cart-header, #orders-header {
+  padding: 2rem;
 }
 
 #home-hero {
   background: #53A2BE;
   color: #FFF;
-}
-
-#our-operation {
-  background: #FFF;
 }
 
 #how-it-works {
@@ -39,22 +71,57 @@ body {
 #help-order {
   background: #FFF;
 }
-#our-operation h1 {
+
+#our-operation {
+  background: #FFF;
+}
+
+#our-operation h1, #digitizing-service h1 {
   /*font-size: 1.2em;*/
   line-height: 150%;
 }
+
 #our-operation h4 {
   font-family: serif;
   line-height: 150%;
   color: #888;
-
 }
+
+#digitizing-service {
+  background: #EEE;
+  margin: 0px;
+}
+
+#digitizing-service h3 {
+   line-height: 150%;
+ }
 
 .clients-img {
   max-height: 40px;
 }
 
 .hero-btn:link, .hero-btn:visited {
+  background: transparent;
+  border: 0.05vw solid rgba(255,255,255,0.4);
+  color: white;
+  padding: 10px;
+  width: 100%;
+  font-size: 2vh;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  text-transform: uppercase;
+
+  transition: all ease-in 0.3s;
+}
+
+.hero-btn:hover, .hero-btn:active {
+  color: #000;
+  background: rgba(255,255,255,1);
+  border: 0.05vw solid rgba(255,255,255,0.2);
+}
+
+.hero-btn, .hero-btn {
   background: transparent;
   border: 0.05vw solid rgba(255,255,255,0.4);
   color: white;
@@ -106,7 +173,8 @@ body {
 }
 
 #brand-logo {
-  max-width: 50px;
+  margin: 2px;
+  max-width: 46px;
 }
 
 .navbar .nav > li > a {
@@ -119,7 +187,7 @@ body {
 
 .navbar {
   margin-bottom: 0px;
-  z-index: 9999;
+  /*z-index: 9999;*/
 }
 
 /*.jumbotron {
@@ -139,9 +207,6 @@ body {
   color: #FFF;
 }
 
-.jumbotron > .container {
-  padding-top: 10%;
-}
 
 /* Custom Button */
 
@@ -166,21 +231,17 @@ body {
 
 /*Remove Border Radius */
 
-.panel {
-  border-radius: 0px;
-  margin: auto;
-  margin-top: 5%;
-  padding-bottom: 2%;
-  width: 80%;
-}
 
 .panel.sign-in-panel {
   display: none;
+  border: none;
+  border-radius: 0px;
 }
 
 .panel.sign-up-panel {
-  /*margin-top: 5%;*/
   display: none;
+  border: none;
+  border-radius: 0px;
 }
 
 .panel.home-panel {
@@ -196,8 +257,53 @@ body {
   text-align: center;
 }
 
-input[type="text"], input[type="password"], input[type="email"], input[type="tel"], .form-group textarea  {
+.alert {
+  margin-bottom: 0px;
   border-radius: 0px;
+}
+input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="file"], input[type="range"], .form-group textarea,
+input[type="number"] {
+  border-radius: 0px;
+}
+
+.panel-group .panel, .panel-group .panel-heading, .panel .panel-footer {
+  border-radius: 0px;
+}
+
+.panel .panel-heading {
+  background: #53A2BE !important;
+}
+
+.panel.canceled {
+  border-color: red;
+}
+
+.panel .panel-heading.canceled {
+  background: red !important;
+}
+
+.panel-body.canceled-panel, .panel-footer.canceled-panel {
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+  filter: blur(1px);
+}
+
+.panel .panel-footer {
+  background: #FFF;
+}
+
+.panel {
+  border-color: #53A2BE;
+}
+
+#builder-step2, #builder-step3, #builder-step4 {
+  /*filter: blur(3px);*/
+  /*display: none;*/
+}
+
+#builder-step2 img {
+  max-width: 80%;
 }
 
 .panel .btn {
@@ -247,23 +353,175 @@ a:hover {
   cursor: pointer;
 }
 
-footer {
+#content {
+  padding-bottom: 20vh;
+}
+
+#footer {
   background: #000;
-  height: 40vh; 
+  padding: 3rem;
+  width: 100%;
+  height: 20vh;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
 }
 
-footer .container {
-  height: 100%;
+#footer img {
+  max-width: 50px;
+  pointer-events: none;
+}
+
+#footer a {
+  color: #CCC;
+}
+
+#footer a:hover {
+  color: #FFF;
+  text-decoration: none;
 }
 
 
+#builder-step1 .row, #builder-step2 .row {
+  margin-bottom: 10px;
+}
 
+#order-items {
+  border-top: 1px solid rgba(200,200,200,0.6);
+}
+.order-item {
+  padding: 1em;
+  margin: 0px;
+  border-bottom: 1px solid rgba(200,200,200,0.6);
+}
+.odd-item {
+  /*background: rgba(200,200,200,0.5);*/
 
+}
 
+.table th, .table td {
+  text-align: left;
+}
 
+.order-item.even {
+  background: #DDD;
+}
 
+.order_img {
+  margin: 10px auto 10px auto;
+  max-width: 50%;
+  max-height: 200px;
+}
 
+.extra-details {
+  text-align: center;
+}
 
+#start-project-from-cart {
+  margin-top: 100px;
+}
+
+#my-cart, #my-orders{
+  padding-bottom: 100px;
+}
+
+.back-to-top {
+  background: #000;
+  margin: 0;
+  position: fixed;
+  bottom: 15vh;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  z-index: 100;
+  display: none;
+  color: #CCC;
+  border-radius: 50%;
+  border: solid rgba(255, 255, 255, 0.3) 0.05rem;
+  font-size: 25px;
+  transition: all ease-in 0.2s;
+}
+
+.back-to-top:hover {
+  color: #FFF;
+  width: 52px;
+  height: 52px;
+  font-size: 26px;
+}
+
+.item-description {
+  overflow-wrap: break-word;
+}
+
+.order-actions button, .order-actions .progress{
+  margin-top: 10px;
+}
+
+.progress {
+  border-radius: 0px;
+  height: 30px;
+}
+
+.custom {
+  font-size: 1.5rem;
+  line-height: 30px;
+  border: 0.005rem solid #666;
+}
+
+.progress .progress-bar-empty {
+  background: #CCC;
+}
+
+#custom-search-input {
+}
+
+.order-img {
+  max-width: 100%;
+  opacity: 0.8;
+}
+
+.order-img:hover, .order-img:focus {
+  opacity: 1;
+}
+.order-img-caption {
+  pointer-events: none;
+  border-radius: 50%;
+  position: absolute;
+  background: #000;
+  color: #FFF;
+  font-size: 1.5em;
+  padding: 15px;
+  top: calc(50% - 25px);
+  left: calc(50% - 20px);
+}
+
+.status-btn {
+  color: #FFF;
+  transition: all ease-out 0.1s;
+}
+
+.status-btn:hover {
+  color: #000;
+  text-decoration: none;
+}
+
+.no-orders-dashboard {
+  margin-top: 5%;
+}
+
+.extra-msg {
+  font-size: 0.8em;
+  color: #CCC;
+}
+
+#show-all {
+  margin-top: 20px;
+  font-size: 1.5em;
+}
+
+/*.back-to-top span {
+  font-size: 25px;
+}*/
 
 /*.navbar-default .navbar-nav > li.active-user {
   background: #555;

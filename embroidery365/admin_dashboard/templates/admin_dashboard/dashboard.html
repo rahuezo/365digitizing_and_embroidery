@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Orders Dashboard</title>
+
+  {% load static %}
+
+  {# ADD CSS #}
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <!-- Scroll Page CSS -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.4/jquery.fullpage.css">
+
+  <!-- Local CSS -->
+  <link rel="stylesheet" href="{% static 'home/css/style.css' %}">
+
+  <link rel="icon" href="{% static 'home/img/favicon.png' %}" sizes="16x16 32x32" type="image/png">
+
+</head>
+<body>
+  <div id="wrapper">
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand pull-left" href="{% url 'home:index' %}"><img src="{% static 'home/img/365DE_mini_logo.png' %}" id="brand-logo" alt=""></a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        {% comment %}
+        <ul class="nav navbar-nav text-center">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'products:shirts' %}">Shirts</a></li>
+              <li><a href="{% url 'products:jackets' %}">Jackets</a></li>
+              <li><a href="{% url 'products:hats' %}">Hats</a></li>
+              <li><a href="{% url 'products:backpacks' %}">Backpacks</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="{% url 'products:custom_items' %}">Custom Items</a></li>
+            </ul>
+          </li>
+          <li><a href="#">Services <span class="sr-only">(current)</span></a></li>
+        </ul>
+        {% endcomment %}
+
+        <ul class="nav navbar-nav navbar-right text-center">
+          <li><a href="{% url 'contact:contact' %}">Contact Us</a></li>
+          <li><a href="{% url 'about:about' %}">About Us</a></li>
+
+          {% if current_user %}
+          <li class="dropdown active-user">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-user"></span>
+            <strong>{{ current_user }}
+              <span class="caret"></span>
+            </strong></a>
+            <ul class="dropdown-menu">
+              {% if request.user.is_superuser %}
+              <li><a href="{% url 'admin_dashboard:dashboard' %}">Admin Dashboard</a></li>
+              {% endif %}
+              <li><a href="{% url 'myaccount' %}">Manage Account</a></li>
+              <li><a href="{% url 'orders:orders' %}">Your Orders</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="{% url 'logout' %}" id="signout-btn">
+                <span class="glyphicon glyphicon-off"></span> Log Out</a>
+              </li>
+            </ul>
+          </li>
+          {% else %}
+          <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
+          {% endif %}
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+
+  <div id="content">
+  <div class="container" id="my-orders">
+    <div class="row" id="orders-header">
+      <div class="col-lg-12">
+        <h1 class="page-title text-center">Orders Dashboard</h1>
+      </div>
+    </div>
+
+    {% if placed_orders.items|length > 0%}
+    <div class="row" id="order-search">
+      <form class="" action="{% url 'admin_dashboard:dashboard' %}" method="post">
+        {% csrf_token %}
+        <div class="col-md-12">
+          <div id="custom-search-input">
+            <div class="input-group col-md-12">
+              <input type="text" class="form-control input-lg text-center" name="order-number-filter" placeholder="Look up order number..." />
+              <span class="input-group-btn">
+                <button class="btn btn-primary btn-lg" type="submit">
+                  <i class="glyphicon glyphicon-search"></i>
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    {% if filtered_query %}
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1>Showing Order <strong>#{{ filtered_query }}</strong></h1>
+      </div>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% if filtered_query %}
+    <div class="row" id="show-all">
+      <div class="col-md-12 text-center">
+        <a href="{% url 'admin_dashboard:dashboard' %}">Show All Orders</a>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if placed_orders.items|length > 0 %}
+
+    <hr>
+
+    <div class="panel-group">
+      {% for username, orders in placed_orders.items%}
+      <h1 class="text-center">Orders by {{username}}</h1><br>
+      {% for order in orders %}
+
+      <div class="panel panel-primary {% if order.active == False %}canceled{% endif %}">
+        <div class="panel-heading {% if order.active == False %}canceled{% endif %}">
+          <div class="row text-center">
+            {% if order.active == False %}
+            <div class="col-lg-6">
+              <h3><span class="glyphicon glyphicon-ban-circle"></span> <strong>Order Has Been Canceled</strong></h3>
+            </div>
+            <div class="order-actions">
+              <div class="col-lg-3">
+                <button type="button" class="btn btn-warning delete-order-btn" data-order-id="{{ order.pk }}" name="button"><span class="glyphicon glyphicon-trash"></span> Delete Order</button>
+              </div>
+              <div class="col-lg-3">
+                <button type="button" class="btn btn-success restore-order-btn" data-order-id="{{ order.pk }}" name="button"><span class="glyphicon glyphicon-repeat"></span> Restore Order</button>
+              </div>
+            </div>
+            {% else %}
+            <div class="col-lg-4">
+              <h3>Order Placed: {{ order.created }}</h3>
+            </div>
+            <div class="col-lg-4">
+              <h3>Total: <strong>${{ order.total }}</strong></h3>
+            </div>
+            <div class="col-lg-4">
+              <h3>Order #: {{ order.order_number }}</h3>
+            </div>
+            {% endif %}
+
+          </div>
+        </div>
+        <div class="panel-body {% if order.active == False %}canceled-panel{% endif %}">
+          {% for item in order.orderitem_set.all %}
+
+          <!-- Modal -->
+          <div class="modal fade" id="myModal{{ item.pk }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel{{ order.pk }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel{{ item.pk }}">Order <strong>#{{ order.order_number }}</strong> Item <strong>{{ item.pk }}</strong> Specifications</h4>
+                </div>
+                <div class="modal-body">
+                  <h4><strong>Customer: </strong>{{ order.customer.first_name }} {{ order.customer.last_name }}</h4>
+                  <h4><strong>Base Item: </strong>{{ item.order_base_item }}</h4>
+                  <h4><strong>Base Item Style: </strong>{{ item.order_style }}</h4>
+                  <h4><strong>Logo: </strong><a href="{{ item.order_logo.url }}">Show Logo</a></h4>
+                  <h4><strong>Logo Placement: </strong>{{ item.order_item_placement }}</h4>
+                  <h4><strong>Logo Width: </strong>{{ item.order_logo_width }} inches</h4>
+                  <h4><strong>Logo Height: </strong>{{ item.order_logo_height }} inches</h4>
+                  <h4><strong>Extra Details: </strong>{% if item.extra_details|length > 0 %}{{ item.extra_details }}{% else %}None{% endif %}</h4>
+                  <h4><strong>Created: </strong>{{ item.created }}</h4>
+                  <hr>
+                  <h4><strong>Quantity, Color, Size, Unit Price, Total: </strong></h4>
+                  {{ item.order_details|safe }}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+              </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+          <div class="row">
+            <div class="col-lg-8">
+              {{ item.order_details|safe}}
+            </div>
+            <div class="col-lg-4">
+              <a href="{{ item.order_logo.url }}">
+                <span class="glyphicon glyphicon-resize-full order-img-caption"></span>
+                <img src="{{ item.order_logo.url }}" alt="" class="order-img">
+              </a>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-lg-12">
+              <button type="button" class="btn btn-primary" data-order-id="{{ order.pk }}" name="button"  data-toggle="modal" data-target="#myModal{{ item.pk }}"><span class="glyphicon glyphicon-list"></span> Get Order Specifications</button>
+            </div>
+          </div>
+          <hr>
+          {% endfor %}
+        </div>
+        {% if order.active == True %}
+        <div class="panel-footer {% if order.active == False %}canceled-panel{% endif %} order-actions">
+          <div class="row">
+
+            <div class="col-lg-2">
+              <button type="button" class="btn btn-danger cancel-order-btn" data-order-id="{{ order.pk }}" name="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel Order</button>
+            </div>
+
+            <div class="col-lg-2">
+              <button type="button" class="btn btn-warning delete-order-btn" data-order-id="{{ order.pk }}" name="button"><span class="glyphicon glyphicon-trash"></span> Delete Order</button>
+            </div>
+
+            <div class="col-lg-8">
+              {% if order.status == 0 %}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="0" data-order-id="{{ order.pk }}" class="status-btn">Received <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="1" data-order-id="{{ order.pk }}" class="status-btn">Preparing</a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="2" data-order-id="{{ order.pk }}" class="status-btn">Embroidering</a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="3" data-order-id="{{ order.pk }}" class="status-btn">Finished</a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="4" data-order-id="{{ order.pk }}" class="status-btn">Shipping</a>
+                </div>
+              </div>
+              {% elif order.status == 1%}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="0" data-order-id="{{ order.pk }}" class="status-btn">Received <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="1" data-order-id="{{ order.pk }}" class="status-btn">Preparing <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="2" data-order-id="{{ order.pk }}" class="status-btn">Embroidering</a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="3" data-order-id="{{ order.pk }}" class="status-btn">Finished</a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="4" data-order-id="{{ order.pk }}" class="status-btn">Shipping</a>
+                </div>
+              </div>
+              {% elif order.status == 2%}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="0" data-order-id="{{ order.pk }}" class="status-btn">Received <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="1" data-order-id="{{ order.pk }}" class="status-btn">Preparing <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="2" data-order-id="{{ order.pk }}" class="status-btn">Embroidering <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="3" data-order-id="{{ order.pk }}" class="status-btn">Finished</a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="4" data-order-id="{{ order.pk }}" class="status-btn">Shipping</a>
+                </div>
+              </div>
+              {% elif order.status == 3%}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="0" data-order-id="{{ order.pk }}" class="status-btn">Received <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="1" data-order-id="{{ order.pk }}" class="status-btn">Preparing <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="2" data-order-id="{{ order.pk }}" class="status-btn">Embroidering <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="3" data-order-id="{{ order.pk }}" class="status-btn">Finished <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-empty" role="progressbar" style="width:20%">
+                  <a data-value="4" data-order-id="{{ order.pk }}" class="status-btn">Shipping</a>
+                </div>
+              </div>
+              {% elif order.status == 4%}
+              <div class="progress">
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="0" data-order-id="{{ order.pk }}" class="status-btn">Received <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="1" data-order-id="{{ order.pk }}" class="status-btn">Preparing <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="2" data-order-id="{{ order.pk }}" class="status-btn">Embroidering <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="3" data-order-id="{{ order.pk }}" class="status-btn">Finished <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+                <div class="progress-bar custom progress-bar-success" role="progressbar" style="width:20%">
+                  <a data-value="4" data-order-id="{{ order.pk }}" class="status-btn">Shipping <span class="glyphicon glyphicon-ok"></span></a>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+      <hr>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    {% if filtered_query %}
+    <hr>
+    <div class="row">
+      <div class="col-lg-12 no-orders-dashboard">
+        <h1 class="text-center text-muted">Order <strong>#{{ filtered_query }}</strong> not found!</h1>
+      </div>
+    </div>
+    {% else %}
+    <hr>
+    <div class="row">
+      <div class="col-lg-12 no-orders-dashboard">
+        <h1 class="text-center text-muted">No Orders to Show at the Moment</h1>
+      </div>
+    </div>
+    {% endif %}
+    {% endif %}
+  </div>
+
+  <form id="status-set-form" action="{% url 'admin_dashboard:update_status' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" id="order-id" name="order-id" value="">
+    <input type="hidden" id="status-choice" name="status-choice" value="">
+  </form>
+  <form id="cancel-order-form" action="{% url 'admin_dashboard:cancel_order' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" id="cancel-order-input" name="order-id" value="">
+  </form>
+  <form id="delete-order-form" action="{% url 'admin_dashboard:delete_order' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" id="delete-order-input" name="order-id" value="">
+  </form>
+  <form id="restore-order-form" action="{% url 'admin_dashboard:restore_order' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" id="restore-order-input" name="order-id" value="">
+  </form>
+
+  </div>
+  <button type="button" name="button" class="back-to-top" data-placement="left" data-toggle="tooltip" title="Back to Top"><span class="glyphicon glyphicon-chevron-up"></span></button>
+
+  <div id="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-2 text-center"><img src="{% static 'home/img/365DE_mini_logo.png' %}" alt=""></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'home:index' %}">Home</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'contact:contact' %}">Contact Us</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'about:about' %}">About Us</a></div>
+        {% if not current_user %}
+        <div class="col-lg-2 text-center"><a href="{% url 'login' %}">Sign In</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'register' %}">Sign Up</a></div>
+        {% else %}
+        <div class="col-lg-2 text-center"><a href="{% url 'cart:cart' %}">Your Cart</a></div>
+        <div class="col-lg-2 text-center"><a href="{% url 'orders:orders' %}">Your Orders</a></div>
+        {% endif %}
+      </div><br>
+      <div class="row">
+        <div class="col-lg-12"><p class="text-muted text-center">Copyright (c) 2017 365 Digitizing and Embroidery All Rights Reserved.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  <!-- Full Page JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.4/jquery.fullpage.extensions.min.js"></script>
+  <!-- Local JS -->
+  <script src="{% static 'home/js/main.js' %}"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var myvar = 100;
+      var offset = 250;
+      var duration = 300;
+
+      $(window).scroll(function() {
+        if ($(this).scrollTop() > offset) {
+          $(".back-to-top").fadeIn(duration);
+        } else {
+          $(".back-to-top").fadeOut(duration);
+        }
+      });
+
+      $(".back-to-top").click(function(event) {
+        event.preventDefault();
+
+        $("html, body").animate({scrollTop: 0}, duration);
+
+        return false;
+      });
+    });
+
+
+    $('.back-to-top').on('mouseenter', function(){
+      $('.back-to-top').tooltip('show');
+    });
+
+    $('.back-to-top').on('mouseleave', function(){
+      $('.back-to-top').tooltip('hide');
+    });
+
+    $('.status-btn').click(function(){
+      let order_id = $(this).data('order-id');
+      let status_choice = $(this).data('value');
+
+      $('#order-id').val(order_id);
+      $('#status-choice').val(status_choice);
+
+      $('#status-set-form').submit();
+    });
+
+    $('.cancel-order-btn').click(function(){
+      let order_id = $(this).data('order-id');
+      $('#cancel-order-input').val(order_id);
+      $('#cancel-order-form').submit();
+    });
+
+    $('.delete-order-btn').click(function(){
+      let order_id = $(this).data('order-id');
+      $('#delete-order-input').val(order_id);
+      $('#delete-order-form').submit();
+    });
+
+    $('.restore-order-btn').click(function(){
+      let order_id = $(this).data('order-id');
+      $('#restore-order-input').val(order_id);
+      $('#restore-order-form').submit();
+    });
+  </script>
+
+
+</body>
+</html>
