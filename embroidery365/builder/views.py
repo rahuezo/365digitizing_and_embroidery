@@ -58,13 +58,15 @@ def add_to_cart(request):
         details = request.POST.get('order-details')
         order_total = request.POST.get('order-total')
         extra_details = request.POST.get('extra-info')
+        logo_colors = request.POST.get('logo-colors')
 
         current_customer = User.objects.all().get(pk=request.user.pk)
 
         new_order = Order(customer=current_customer, order_base_item=base_item,
                           order_style=style, order_logo=item_logo, order_item_placement=item_logo_placement,
                           order_logo_width=item_logo_width, order_logo_height=item_logo_height,
-                          order_details=get_table_details(details), extra_details=extra_details, total=order_total)
+                          order_details=get_table_details(details), extra_details=extra_details, total=order_total,
+                          logo_colors=logo_colors)
 
         fs = FileSystemStorage()
 

@@ -56,7 +56,8 @@ def checkout_cart_view(request):
                         order_style=order.order_style, order_logo=order.order_logo,
                         order_item_placement=order.order_item_placement, order_logo_width=order.order_logo_width,
                         order_logo_height=order.order_logo_height, order_details=order.order_details,
-                        total=order.total, extra_details=order.extra_details, created=order.created
+                        total=order.total, extra_details=order.extra_details,
+                        logo_colors=order.logo_colors, created=order.created
                         )
         noi.save()
 

@@ -128,14 +128,26 @@
                   <input type="file" class="form-control" id="item-logo-input" name="item-logo-input" value="">
                 </div>
               </div>
+
               <div class="row">
-                <div class="col-lg-12" id="item-placement-div">
+                <div class="col-lg-6" id="item-placement-div">
                   <h4>Choose the placement of your logo.</h4><br>
                   <select class="form-control" id="item-placement-select" name="item-placement-select">
                     <option selected disabled>Choose Placement</option>
                   </select>
                 </div>
+
+                <div class="col-lg-6">
+                  <h4>Number of Colors for Logo (min=1, max=6)<h4><br>
+                  <input type="hidden" id="logo-colors" name="logo-colors" value="">
+                  <input type="number" class="form-control" id="ncolors" name="ncolors" min="1" max="6" step="1" value="1">
+                </div>
               </div>
+              <div class="row">
+                <div class="col-lg-12" id="colors-container">
+
+                </div>
+              </div><br>
               <div class="row" id="logo-size">
                 <h4>Choose the size of the logo.</h4><br>
                 <div class="col-lg-6">
@@ -266,6 +278,7 @@
       $('#item-placement-div').hide();
       $('#logo-size').hide();
       $('#receipt').hide();
+      $('#colors-container').hide(); 
 
       $('#item-select').change(function(){
         let current_base_item = $(this).val();
@@ -313,10 +326,13 @@
         let logo_size = $('#logo-size');
         add_order_item('disabled');
         logo_size.slideDown();
+        create_n_color_pickers();
+        $('#colors-container').slideDown();
         $('#builder-step3').slideDown();
       });
 
       $('#complete-order-btn').click(function(){
+        $('#logo-colors').val(get_ncolors());
         show_receipt();
         let order_details = $('#receipt').prop('outerHTML');
         let order_total = $('#order-total-value').text();
@@ -352,6 +368,40 @@
 
     });
 
+    $('#ncolors').change(function(){
+      create_n_color_pickers();
+    });
+
+    function get_ncolors() {
+      let colors = $('.logo-color');
+      let colors_code = '<div class="row">';
+      let colors_list = "";
+
+      colors.each(function(index){
+        colors_list += `<div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 text-center">
+        <h3>Color ` + (index + 1) + `</h3><span class="glyphicon glyphicon-stop"
+        style="color: `+ $(this).val() + `; font-size:1.5rem; border: 0.01rem solid #000;"></span> ` + $(this).val() + "</div>";
+      });
+
+      return colors_code + colors_list + '</div>';
+    }
+
+    function create_n_color_pickers() {
+      let ncolors = $('#ncolors').val();
+
+      $('#colors-container').html('');
+
+      for (let i=0; i < ncolors; i++) {
+        $('#colors-container').append(
+          '<div id="color-inputs"><div class="col-lg-' + Math.floor(12/ncolors) +
+          ' col-md-' + Math.floor(12/ncolors) +
+          ' col-sm-' + Math.floor(12/ncolors) +
+          ' col-xs-12">' +
+          '<h4>Color ' + (i + 1) + '</h4><br>' +
+          '<input type="color" class="logo-color"></div></div>'
+        );
+      }
+    }
     function add_order_item(disability='') {
       let order_items = $('#order-items');
       let item_description = '';

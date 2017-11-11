@@ -32,6 +32,7 @@ class OrderItem(models.Model):
     order_details = models.TextField(blank=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     extra_details = models.TextField(blank=True, null=True)
+    logo_colors = models.TextField(blank=True, null=True)
     created = models.DateField(auto_now_add=True)
 
     def __str__(self):

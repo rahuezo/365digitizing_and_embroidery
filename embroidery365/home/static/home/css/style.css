@@ -353,9 +353,6 @@ a:hover {
   cursor: pointer;
 }
 
-#content {
-  padding-bottom: 20vh;
-}
 
 #footer {
   background: #000;
@@ -517,6 +514,11 @@ a:hover {
 #show-all {
   margin-top: 20px;
   font-size: 1.5em;
+}
+
+#content {
+  height: 100%;
+  padding-bottom: 30vh;
 }
 
 /*.back-to-top span {
